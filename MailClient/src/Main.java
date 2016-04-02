@@ -4,8 +4,13 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-	
+
 	private static Scanner in = new Scanner(System.in);
+
+	/*
+	 * TODO: Record information in the beginning
+	 * To avoid tedious ReadIn procedure
+	*/
 	private static String[] SmtpServer = {"localhost", "smtp.sjtu.edu.cn"};
 	private static String[] Pop3Server = {"localhost", "pop3.sjtu.edu.cn"};
 	private static String Address = "taringlee@sjtu.edu.cn";
@@ -14,10 +19,10 @@ public class Main {
 	private static String To = "379710956@qq.com";
 	private static String Subject = "Test Mail";
 	private static String Text = "I miss U... \n Dreamaker";
-	
+
 	public static void testSmtp(int choice) {
 		System.out.println("Test Smtp");
-		
+
 		Smtp mail = new Smtp();
 		mail.setServer(SmtpServer[choice]);
 		mail.setAddress(Address);
@@ -28,17 +33,17 @@ public class Main {
 		mail.setText(Text);
 		if (choice != 0)
 			mail.setPort(25);
-		
+
 		boolean state = mail.sendMail();
 		if (state)
 			System.out.println("Send Email Succeed");
 		else
 			System.out.println("Send Email Failed");
 	}
-	
+
 	public static void testPop3(int choice) {
 		System.out.println("Test Pop3");
-		
+
 		Pop3 mail = new Pop3();
 		mail.setServer(Pop3Server[choice]);
 		//mail.setAddress(To);
@@ -46,13 +51,13 @@ public class Main {
 		mail.setPassword(Password);
 		if (choice != 0)
 			mail.setPort(110);
-		
+
 		mail.Init();
 
 		if (!mail.login())
 			return;
 		System.out.println("The number of mails: " + mail.countMail());
-		
+
 		for (String input = in.next(); !input.startsWith("q"); input = in.next()) {
 			if (input.startsWith("g")) {
 				//Action: Get
@@ -68,9 +73,9 @@ public class Main {
 				System.out.println("The number of mails: " + mail.countMail());
 			}
 		}
-	
+
 		mail.quit();
-		
+
 		try {
 			mail.Close();
 		} catch (IOException e) {
@@ -78,20 +83,15 @@ public class Main {
 			System.out.println("Close Error!");
 		}
 	}
-	
+
+/*
+	TODO: Run Pop3 or Smtp Client
+	Notice: choice means the property of Server, localhost or others
+*/
+
 	public static void main(String[] args) {
 		int choice = 1;
-		/*
-		 If (args[1].equalsIgnareCase("localhost"))
-		 	choice = 0;
-		 else
-		 	choice = 1;
-		 */
-		//if (Integer.parseInt(args[0]) == '0' || args[0].equalsIgnoreCase("Smtp")) {
-		//testSmtp(choice);
-		//} else {
 		testPop3(choice);
-		//}
 	}
-	
+
 }

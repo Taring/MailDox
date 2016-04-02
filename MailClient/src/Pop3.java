@@ -8,28 +8,28 @@ public class Pop3 {
 	private String server;
 	private String address;
 	private String password;
-	
+
 	private static String Newline = "\r\n";
-	
+
 	private int port = 2110;//110;
 	private Socket socket;
 	BufferedReader in;
 	DataOutputStream out;
-	
+
 	public String getServer() {
 		return server;
 	}
 	public void setServer(String server){
 		this.server = server;
 	}
-	
+
 	public String getAddress() {
 		return address;
 	}
 	public void setAddress(String address){
 		this.address = address;
 	}
-	
+
 	public String getPassword() {
 		return password;
 	}
@@ -44,18 +44,27 @@ public class Pop3 {
 		this.port = port;
 	}
 
+/*
+ * TODO: Get the response of server
+*/
 	public String respond() throws IOException {
 		String ans = in.readLine();
 		return ans;
 	}
-	
+
+	/*
+	 * TODO: Set message to server
+	*/
 	public String send(String text) throws IOException {
 		out.writeBytes(text);
 		out.flush();
 		String ans = respond();
 		return ans;
 	}
-	
+
+	/*
+	* TODO: Check the status of reponse (Normal or Not)
+	*/
 	public boolean checkResponse(String response, String correctNumber, String Error) {
 		if (!response.startsWith(correctNumber)) {
 			System.out.println(Error + response);
@@ -64,6 +73,9 @@ public class Pop3 {
 			return true;
 	}
 
+	/*
+	* TODO: Login Procedure, including Address and Password subprocedure
+	*/
 	public boolean login() {
 		try {
 			//Login -> Address
@@ -74,7 +86,7 @@ public class Pop3 {
 			if (!checkResponse(loginAddressAnswer, "+OK", "Login Address failed :"))
 				return false;
 			System.out.println(loginAddressAnswer);
-			
+
 			//Login -> Password
 			String passwordAnswer = "pass " + password + Newline;
 			String loginPasswordAnswer = send(passwordAnswer);
@@ -91,7 +103,10 @@ public class Pop3 {
 		}
 		return true;
 	}
-	
+
+	/*
+	* TODO: Quit procedure
+	*/
 	public boolean quit() {
 		try {
 			String quitAnswer = send("quit " + Newline);
@@ -103,7 +118,10 @@ public class Pop3 {
 		}
 		return true;
 	}
-	
+
+	/*
+	* TODO: Count mail Operation
+	*/
 	public int countMail() {
 		try {
 			String countAnswer = null;
@@ -118,7 +136,7 @@ public class Pop3 {
 				System.out.println("CountMail Error: " + countAnswer);
 				return -2;
 			}
-			
+
 			countAnswer = countAnswer.substring(4);
 			if (countAnswer.indexOf(" ") > 0)
 				countAnswer = countAnswer.substring(0, countAnswer.indexOf(" "));
@@ -128,14 +146,17 @@ public class Pop3 {
 			return 0;
 		}
 	}
-	
+
+
+	/*
+	* TODO: Get mail procedure
+	*/
 	public String getText() throws IOException {
 		String answer = "";
 		for (String tmp = respond(); !tmp.equals("."); tmp = respond())
 			answer += tmp + "\r\n";
 		return answer;
 	}
-	
 	public String getMail(int number) {
 		String getAnswer = null;
 		try {
@@ -146,7 +167,7 @@ public class Pop3 {
 		if (!checkResponse(getAnswer, "+OK", "Get failed :"))
 			return null;
 		System.out.println("Get Succeed!");
-		
+
 		String textAnswer = null;
 		try {
 			textAnswer = getText();
@@ -156,7 +177,10 @@ public class Pop3 {
 		}
 		return textAnswer;
 	}
-	
+
+	/*
+	* TODO: Delete mail procedure
+	*/
 	public void deleteMail(int number) {
 		String deleteAnswer = null;
 		try {
@@ -168,34 +192,37 @@ public class Pop3 {
 			return;
 		System.out.println("Delete Succeed!");
 	}
-	
+
+	/*
+	* TODO: Initialization procedure
+	*/
 	public void Init() {
 		boolean flag = true;
-		try { 
-			socket = new Socket(server, port); 
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
+		try {
+			socket = new Socket(server, port);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new DataOutputStream(socket.getOutputStream());
-			String initAnswer = respond(); 
+			String initAnswer = respond();
 			if(!initAnswer.startsWith("+OK")) {
 				System.out.println("Init failed: " + initAnswer);
 				flag = false;
-			} 
-		} catch (UnknownHostException e) { 
+			}
+		} catch (UnknownHostException e) {
 			System.out.println("UnknownHostException Error");
 			flag = false;
-			e.printStackTrace(); 
-		} catch (IOException e) { 
-			System.out.println("IOException Error"); 
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("IOException Error");
 			flag = false;
-			e.printStackTrace(); 
-		} 
+			e.printStackTrace();
+		}
 		if (flag)
-			System.out.println("Init succeed!");		
+			System.out.println("Init succeed!");
 	}
-	
+
 	public void Close() throws IOException {
 		socket.close();
 		in.close();
-		out.close();	
+		out.close();
 	}
 }
